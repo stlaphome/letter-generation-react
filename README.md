@@ -1,2 +1,2 @@
-# letter-generation-react
-front source for lettergenration
+# letter-react
+is used to create letter and generate letter

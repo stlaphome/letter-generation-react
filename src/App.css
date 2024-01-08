@@ -1,0 +1,7 @@
+.MuiDataGrid-columnHeaderTitleContainerContent {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  font-weight: 500;
+  font-size: 0.875rem;
+}

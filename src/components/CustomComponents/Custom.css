@@ -1,0 +1,125 @@
+/* .css-md26zr-MuiInputBase-root-MuiOutlinedInput-root {
+  height: 2em;
+} */
+
+.css-1ualgfl-MuiInputBase-root-MuiOutlinedInput-root-MuiSelect-root {
+  height: 2em;
+}
+.css-1v3mi3q-MuiInputBase-root-MuiInput-root-MuiSelect-root {
+  font-size: 14px !important;
+}
+.noDataImage {
+  width: 15%;
+}
+
+/* .css-154xyx0-MuiInputBase-root-MuiOutlinedInput-root {
+  height: 2em;
+} */
+.css-m8ud5f-MuiAutocomplete-root .MuiInput-root .MuiInput-input {
+  font-size: 14px !important;
+}
+.css-1x51dt5-MuiInputBase-input-MuiInput-input.Mui-disabled {
+  color: rgba(0, 0, 0, 0.599) !important;
+  -webkit-text-fill-color: rgba(0, 0, 0, 0.599) !important;
+  font-size: 14px !important;
+}
+
+.css-9npbnl-MuiFormLabel-root-MuiInputLabel-root {
+  color: rgba(0, 0, 0, 0.699) !important;
+  font-weight: bold !important;
+}
+
+.css-1t8l2tu-MuiInputBase-input-MuiOutlinedInput-input.Mui-disabled {
+  -webkit-text-fill-color: rgb(29 38 36 / 95%) !important;
+}
+
+.css-nxo287-MuiInputBase-input-MuiOutlinedInput-input.Mui-disabled {
+  -webkit-text-fill-color: rgb(29 38 36 / 95%) !important;
+}
+
+.css-11u53oe-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input.Mui-disabled {
+  -webkit-text-fill-color: rgb(29 38 36 / 95%) !important;
+}
+
+.css-1rzse1j-MuiFormLabel-root-MuiInputLabel-root {
+  color: rgba(0, 0, 0, 0.699) !important;
+  font-weight: bold !important;
+}
+
+.css-1ybf4nc-MuiFormLabel-root-MuiInputLabel-root {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji",
+    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji" !important;
+  font-weight: 400;
+  font-size: "0.875rem";
+}
+.css-11estnn-MuiButtonBase-root-MuiButton-root {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji",
+    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji" !important;
+}
+
+.css-3wpmqo-MuiDataGrid-root {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji",
+    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji" !important;
+}
+
+.css-1x51dt5-MuiInputBase-input-MuiInput-input {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji",
+    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji" !important;
+  font-weight: 400;
+  font-size: 14px !important;
+}
+
+body {
+  background-color: #eeeeee !important;
+}
+
+.MuiFormLabel-asterisk {
+  color: red;
+}
+
+@media (max-width: 34em) {
+  .css-1o83tna-MuiFormControl-root {
+    min-width: 20px !important;
+  }
+}
+
+.MuiTabPanel-root {
+  padding: 0 24px 24px 24px !important;
+}
+
+.placeHolder_text {
+  color: #aaaaaa;
+  padding: 0;
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji",
+    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji" !important;
+  font-weight: 400;
+  font-size: "14px";
+}
+
+@media (max-width: 34em) {
+  .MuiTabs-flexContainer {
+    gap: 0.5rem;
+  }
+}
+
+.MuiTabs-root {
+  min-height: 0px !important;
+}
+
+h4 {
+  margin-block-start: 5px;
+  margin-block-end: 5px;
+  color: #003f7c;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji",
+    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji" !important;
+}
+label + .css-1ptx2yq-MuiInputBase-root-MuiInput-root {
+  margin-top: 19px !important;
+}

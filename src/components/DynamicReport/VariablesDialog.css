@@ -1,0 +1,11 @@
+#shortcut-popups {
+  z-index: 1301;
+}
+
+#leftbox {
+  float: left;
+}
+
+#rightbox {
+  float: right;
+}
