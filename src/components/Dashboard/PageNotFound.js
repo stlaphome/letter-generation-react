@@ -1,6 +1,6 @@
 import { Box } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import PageNotFoundImage from "../images/pageNotFound.png";
+import PageNotFoundImage from "../../images/pageNotFound.png";
 import axios from "axios";
 
 const PageNotFound = () => {
