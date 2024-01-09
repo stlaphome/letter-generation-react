@@ -81,8 +81,8 @@ function Pagelayout() {
   const [startPoll, setStartPoll] = useState(false);
   const [latestSessionData, setLatestSessionData] = useState({});
   const [userName, setUserName] = useState("");
-  var newAxiosBaseUrl = { ...axios };
-  newAxiosBaseUrl.defaults.baseURL =
+  let newAxiosBase = { ...axios };
+  newAxiosBase.defaults.baseURL =
     process.env.REACT_APP_NON_LMS_COMMON_LOGIN_BACKEND_SERVER;
 
   let paramValues = useParams();
@@ -193,7 +193,6 @@ function Pagelayout() {
 
   useEffect(() => {
     // for every 5 sec poll the backend & check for keys if keys mismatch then logout & redirect to login.
-    const newAxiosBase = { ...newAxiosBaseUrl };
     const urlParamValues = getUrlParamValues();
     const userIdValue = urlParamValues[encodedUserId];
     const mobileNumberValue = urlParamValues[encodedMobileNumber];
@@ -202,6 +201,9 @@ function Pagelayout() {
     let userSessionData;
     const countDown = setInterval(async () => {
       "use strict";
+      let newAxiosBase = { ...axios };
+      newAxiosBase.defaults.baseURL =
+        process.env.REACT_APP_NON_LMS_COMMON_LOGIN_BACKEND_SERVER;
       const sessionDataString = localStorage.getItem(
         userIdValue ? String(userIdValue) : String(mobileNumberValue)
       );
@@ -265,7 +267,6 @@ function Pagelayout() {
     const compareSessionKeys = async () => {
       // get the login page url if required to redirect.
       let loginUrl = "";
-      const newAxiosBase = { ...newAxiosBaseUrl };
       const response = await newAxiosBase.post(
         "nonlmscommonlogin/getSubProductDataByCode",
         {
@@ -407,7 +408,6 @@ function Pagelayout() {
   const [loading, setLoading] = useState(true);
 
   const handleLogout = async (manualtrigger) => {
-    const newAxiosBase = { ...newAxiosBaseUrl };
     if (manualtrigger) {
       const urlParamValues = getUrlParamValues();
       const userIdValue = urlParamValues[encodedUserId];
@@ -492,7 +492,6 @@ function Pagelayout() {
   };
 
   const tabCloseLogout = async () => {
-    const newAxiosBase = { ...newAxiosBaseUrl };
     const urlParamValues = getUrlParamValues();
     const userIdValue = urlParamValues[encodedUserId];
     const mobileNumberValue = urlParamValues[encodedMobileNumber];
@@ -676,7 +675,7 @@ function Pagelayout() {
       <Stack direction="row" sx={{ width: "100%", justifyContent: "flex-end" }}>
         <Stack direction="row" sx={{ padding: "8px" }}>
           <Typography
-            sx={{ textAlign: "right", color: "#004A92", fontSize: "1.5rem" }}
+            sx={{ textAlign: "right", color: "white", fontSize: "1.5rem" }}
           >
             {userName}
           </Typography>
@@ -698,7 +697,7 @@ function Pagelayout() {
           ></Stack>
           <Tooltip title="Logout">
             <IconButton onClick={() => handleLogout(true)}>
-              <LogoutTwoTone sx={{ color: "#004A92" }} fontSize="large" />
+              <LogoutTwoTone sx={{ color: "white" }} fontSize="large" />
             </IconButton>
           </Tooltip>
         </Stack>
