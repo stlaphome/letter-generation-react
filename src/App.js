@@ -2,8 +2,8 @@ import "./App.css";
 
 import { Route, Routes } from "react-router-dom";
 
-import Pagelayout from "./components/Dashboard/Pagelayout";
 import PageNotFound from "./components/CustomComponents/PageNotFound";
+import Pagelayout from "./components/Pagelayout/Pagelayout";
 
 function App() {
   return (
