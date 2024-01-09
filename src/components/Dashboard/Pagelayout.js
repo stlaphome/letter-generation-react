@@ -45,7 +45,7 @@ import {
 
 import TextEditor from "../DynamicReport/TextEditor";
 import TriggerView from "../DynamicReport/TriggerView";
-import PageNotFound from "./PageNotFound";
+import PageNotFound from "../CustomComponents/PageNotFound";
 
 const drawerWidth = 300;
 
