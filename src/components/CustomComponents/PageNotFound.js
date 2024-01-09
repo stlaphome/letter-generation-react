@@ -5,9 +5,12 @@ import axios from "axios";
 
 const PageNotFound = () => {
   const [loginUrl, setLoginUrl] = useState("");
+  let newAxiosBase = { ...axios };
+  newAxiosBase.defaults.baseURL =
+    process.env.REACT_APP_NON_LMS_COMMON_LOGIN_BACKEND_SERVER;
   useEffect(() => {
     const getLoginUrl = async () => {
-      const response = await axios.post(
+      const response = await newAxiosBase.post(
         "nonlmscommonlogin/getSubProductDataByCode",
         {
           subProductCode: ["COMMON_LOGIN_UI"],
@@ -16,11 +19,11 @@ const PageNotFound = () => {
       if (response.status === 200) {
         const subProductDetails = response.data;
         let url = subProductDetails[0]?.subProductCodeUrl;
-        url = url + "/" + btoa("subProductId") + btoa("ADDRESS_MASTER");
+        url = url + "/" + btoa("subProductId") + btoa("LETTER_GENERATION");
         setLoginUrl(url);
       }
     };
-    // getLoginUrl();
+    getLoginUrl();
   }, []);
   return (
     <React.Fragment>
