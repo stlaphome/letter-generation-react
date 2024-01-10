@@ -79,7 +79,6 @@ function Pagelayout() {
   var encodedUserId = btoa("UserId");
   var encodedMobileNumber = btoa("MobileNumber");
   var encodedActiveSessionTabId = btoa("activeSessionTabId");
-  var encodedDashboardRedirect = btoa("DASHBOARDREDIRECT");
   const [startPoll, setStartPoll] = useState(false);
   const [initialPollAfterLoad, setInitialPollAfterLoad] = useState(true);
   const [latestSessionData, setLatestSessionData] = useState({});
@@ -115,9 +114,9 @@ function Pagelayout() {
     if (String(window.location.pathname).includes("letterGenerationCreate")) {
       let paramValue = pageUrlParamValue.split("letterGenerationCreate/")[1];
       paramValue = String(window.location.pathname).includes(
-        btoa("DASHBOARDREDIRECT")
+        "dashboard_redirect"
       )
-        ? paramValue.split(btoa("DASHBOARDREDIRECT") + "/")[1]
+        ? paramValue.split("dashboard_redirect" + "/")[1]
         : paramValue;
       const loginType = paramValue.split("/")[0];
       const sessionValue = paramValue.split("/")[1];
@@ -133,9 +132,9 @@ function Pagelayout() {
       // it was consider by default as a letterGenerationTrigger page.
       let paramValue = pageUrlParamValue.split("letterGenerationTrigger/")[1];
       paramValue = String(window.location.pathname).includes(
-        btoa("DASHBOARDREDIRECT")
+        "dashboard_redirect"
       )
-        ? paramValue.split(btoa("DASHBOARDREDIRECT") + "/")[1]
+        ? paramValue.split("dashboard_redirect" + "/")[1]
         : paramValue;
       const loginType = paramValue.split("/")[0];
       const sessionValue = paramValue.split("/")[1];
@@ -175,9 +174,7 @@ function Pagelayout() {
         const currentTabrandomKeyDt = sessionData?.encodedRandomKey;
         const currentTabActiveSessionId =
           sessionData?.encodedActiveSessionTabId;
-        if (
-          String(window.location.pathname).includes(btoa("DASHBOARDREDIRECT"))
-        ) {
+        if (String(window.location.pathname).includes("dashboard_redirect")) {
           if (
             !initialPollAfterLoadValue &&
             currentTabConfigDt === null &&
@@ -264,9 +261,7 @@ function Pagelayout() {
           );
           userSessionData = response.data;
           if (
-            !String(window.location.pathname).includes(
-              btoa("DASHBOARDREDIRECT")
-            )
+            !String(window.location.pathname).includes("dashboard_redirect")
           ) {
             setLatestSessionData(userSessionData);
           }
@@ -281,17 +276,13 @@ function Pagelayout() {
           );
           userSessionData = response.data;
           if (
-            !String(window.location.pathname).includes(
-              btoa("DASHBOARDREDIRECT")
-            )
+            !String(window.location.pathname).includes("dashboard_redirect")
           ) {
             setLatestSessionData(userSessionData);
           }
         }
 
-        if (
-          String(window.location.pathname).includes(btoa("DASHBOARDREDIRECT"))
-        ) {
+        if (String(window.location.pathname).includes("dashboard_redirect")) {
           // for dashboard access type poll the dashboard data also & compare the dashboard session id with letter generation id.
           let dashboardSessionData;
 
@@ -420,9 +411,7 @@ function Pagelayout() {
       // dashboard page
       let userSessionData;
 
-      if (
-        String(window.location.pathname).includes(btoa("DASHBOARDREDIRECT"))
-      ) {
+      if (String(window.location.pathname).includes("dashboard_redirect")) {
         // when data is parsed properly & the url contains the dashboard redirect.
         // then insert this new session for subproduct to the db.
         // now store the data to backend table.
@@ -992,7 +981,7 @@ function Pagelayout() {
             <Routes>
               <Route
                 exact
-                path={`letterGenerationCreate/${encodedDashboardRedirect}:${encodedDashboardRedirect}/${encodedUserId}:${encodedUserId}/${encodedActiveSessionTabId}:${encodedActiveSessionTabId}`}
+                path={`letterGenerationCreate/dashboard_redirect/${encodedUserId}:${encodedUserId}/${encodedActiveSessionTabId}:${encodedActiveSessionTabId}`}
                 element={<TextEditor />}
               />
               <Route
@@ -1002,7 +991,7 @@ function Pagelayout() {
               />
               <Route
                 exact
-                path={`letterGenerationCreate/${encodedDashboardRedirect}:${encodedDashboardRedirect}/${encodedMobileNumber}:${encodedMobileNumber}/${encodedActiveSessionTabId}:${encodedActiveSessionTabId}`}
+                path={`letterGenerationCreate/dashboard_redirect/${encodedMobileNumber}:${encodedMobileNumber}/${encodedActiveSessionTabId}:${encodedActiveSessionTabId}`}
                 element={<TextEditor />}
               />
               <Route
@@ -1013,7 +1002,7 @@ function Pagelayout() {
 
               <Route
                 exact
-                path={`letterGenerationTrigger/${encodedDashboardRedirect}:${encodedDashboardRedirect}/${encodedUserId}:${encodedUserId}/${encodedActiveSessionTabId}:${encodedActiveSessionTabId}`}
+                path={`letterGenerationTrigger/dashboard_redirect/${encodedUserId}:${encodedUserId}/${encodedActiveSessionTabId}:${encodedActiveSessionTabId}`}
                 element={<TriggerView />}
               />
               <Route
@@ -1024,7 +1013,7 @@ function Pagelayout() {
 
               <Route
                 exact
-                path={`letterGenerationTrigger/${encodedDashboardRedirect}:${encodedDashboardRedirect}/${encodedMobileNumber}:${encodedMobileNumber}/${encodedActiveSessionTabId}:${encodedActiveSessionTabId}`}
+                path={`letterGenerationTrigger/dashboard_redirect/${encodedMobileNumber}:${encodedMobileNumber}/${encodedActiveSessionTabId}:${encodedActiveSessionTabId}`}
                 element={<TriggerView />}
               />
               <Route
