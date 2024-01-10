@@ -30,6 +30,8 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import Toolbar from "@mui/material/Toolbar";
 import { styled } from "@mui/material/styles";
 import { default as React, useEffect, useLayoutEffect, useState } from "react";
+import SFLogoSmall from "../../images/SFLogo.png";
+import Logo from "../../images/SF_Logo.png";
 
 import CryptoJS from "crypto-js";
 
@@ -782,15 +784,21 @@ function Pagelayout() {
     }
 
     // append the current active user & session id for navigate on side menu click change.
-    // if(){
+    const urlParamValues = getUrlParamValues();
+    const userIdValue = urlParamValues[encodedUserId];
+    const mobileNumberValue = urlParamValues[encodedMobileNumber];
+    const activeSessionTabId = urlParamValues[encodedActiveSessionTabId];
+    path =
+      path +
+      (String(window.location.pathname).includes("dashboard_redirect")
+        ? "/dashboard_redirect/"
+        : "/") +
+      (userIdValue ? encodedUserId : encodedMobileNumber) +
+      (userIdValue ? userIdValue : mobileNumberValue) +
+      "/" +
+      encodedActiveSessionTabId +
+      activeSessionTabId;
 
-    // }
-    // "/" +
-    //   encodedUserId +
-    //   btoa(employeeID) +
-    //   "/" +
-    //   activeSessionTabId +
-    //   btoa(userSessionData.sessionActiveTabId);
     navigate(path, { replace: true });
   };
 
@@ -883,7 +891,12 @@ function Pagelayout() {
       <Stack direction="row" sx={{ width: "100%", justifyContent: "flex-end" }}>
         <Stack direction="row" sx={{ padding: "8px" }}>
           <Typography
-            sx={{ textAlign: "right", color: "white", fontSize: "1.5rem" }}
+            sx={{
+              textAlign: "right",
+              color: "white",
+              fontSize: "1.5rem",
+              fontFamily: "Roboto",
+            }}
           >
             {userName}
           </Typography>
@@ -943,6 +956,15 @@ function Pagelayout() {
             >
               <MenuIcon />
             </IconButton>
+            {
+              <Stack direction="row" sx={{ width: "calc(100% - 600px)" }}>
+                <img
+                  height="36px"
+                  src={!deviceModeValue ? Logo : SFLogoSmall}
+                  alt="No Logo"
+                ></img>
+              </Stack>
+            }
             {logOutBtn}
           </Toolbar>
         </AppBar>
