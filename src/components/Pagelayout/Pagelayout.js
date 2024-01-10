@@ -73,12 +73,15 @@ function Pagelayout() {
   const [openLetterGenerationSubMenu, setOpenLetterGenerationSubMenu] =
     useState(false);
   const navigate = useNavigate();
+  const { search } = useLocation();
   const deviceModeValue = useMediaQuery("(max-width:1200px)");
 
   var encodedUserId = btoa("UserId");
   var encodedMobileNumber = btoa("MobileNumber");
   var encodedActiveSessionTabId = btoa("activeSessionTabId");
+  var encodedDashboardRedirect = btoa("DASHBOARDREDIRECT");
   const [startPoll, setStartPoll] = useState(false);
+  const [initialPollAfterLoad, setInitialPollAfterLoad] = useState(true);
   const [latestSessionData, setLatestSessionData] = useState({});
   const [userName, setUserName] = useState("");
   let newAxiosBase = { ...axios };
@@ -110,7 +113,12 @@ function Pagelayout() {
     let activeSessionTabId = undefined;
     const pageUrlParamValue = { ...paramValues }["*"];
     if (String(window.location.pathname).includes("letterGenerationCreate")) {
-      const paramValue = pageUrlParamValue.split("letterGenerationCreate/")[1];
+      let paramValue = pageUrlParamValue.split("letterGenerationCreate/")[1];
+      paramValue = String(window.location.pathname).includes(
+        btoa("DASHBOARDREDIRECT")
+      )
+        ? paramValue.split(btoa("DASHBOARDREDIRECT") + "/")[1]
+        : paramValue;
       const loginType = paramValue.split("/")[0];
       const sessionValue = paramValue.split("/")[1];
       const activeSessionTabIdValue = sessionValue?.split(
@@ -123,7 +131,12 @@ function Pagelayout() {
       mobileNumberValue = loginType?.split(encodedMobileNumber)[1];
     } else {
       // it was consider by default as a letterGenerationTrigger page.
-      const paramValue = pageUrlParamValue.split("letterGenerationTrigger/")[1];
+      let paramValue = pageUrlParamValue.split("letterGenerationTrigger/")[1];
+      paramValue = String(window.location.pathname).includes(
+        btoa("DASHBOARDREDIRECT")
+      )
+        ? paramValue.split(btoa("DASHBOARDREDIRECT") + "/")[1]
+        : paramValue;
       const loginType = paramValue.split("/")[0];
       const sessionValue = paramValue.split("/")[1];
       const activeSessionTabIdValue = sessionValue?.split(
@@ -150,6 +163,7 @@ function Pagelayout() {
     const uiPollCountDown = setInterval(() => {
       "use strict";
       const pollValue = new Boolean(startPoll);
+      const initialPollAfterLoadValue = new Boolean(initialPollAfterLoad);
       if (pollValue) {
         const sessionDataString = localStorage.getItem(
           userIdValue ? String(userIdValue) : String(mobileNumberValue)
@@ -162,20 +176,44 @@ function Pagelayout() {
         const currentTabActiveSessionId =
           sessionData?.encodedActiveSessionTabId;
         if (
-          currentTabConfigDt === null &&
-          currentTabrandomKeyDt === null &&
-          currentTabActiveSessionId === null
+          String(window.location.pathname).includes(btoa("DASHBOARDREDIRECT"))
         ) {
-          // when null means other tab was logged out or reloaded.
+          if (
+            !initialPollAfterLoadValue &&
+            currentTabConfigDt === null &&
+            currentTabrandomKeyDt === null &&
+            currentTabActiveSessionId === null
+          ) {
+            // when null means other tab was logged out or reloaded.
 
-          clearInterval(uiPollCountDown);
-          localStorage.removeItem(
-            userIdValue ? String(userIdValue) : String(mobileNumberValue)
-          );
-          // false means -> it was not a manual trigger this indicates the backend data should not delete & ui alone should route
-          // since if i clear db new session also will logout.
-          handleLogout(false);
+            clearInterval(uiPollCountDown);
+            localStorage.removeItem(
+              userIdValue ? String(userIdValue) : String(mobileNumberValue)
+            );
+            // false means -> it was not a manual trigger this indicates the backend data should not delete & ui alone should route
+            // since if i clear db new session also will logout.
+
+            handleLogout(false);
+          }
+        } else {
+          if (
+            currentTabConfigDt === null &&
+            currentTabrandomKeyDt === null &&
+            currentTabActiveSessionId === null
+          ) {
+            // when null means other tab was logged out or reloaded.
+
+            clearInterval(uiPollCountDown);
+            localStorage.removeItem(
+              userIdValue ? String(userIdValue) : String(mobileNumberValue)
+            );
+            // false means -> it was not a manual trigger this indicates the backend data should not delete & ui alone should route
+            // since if i clear db new session also will logout.
+
+            handleLogout(false);
+          }
         }
+        setInitialPollAfterLoad(false);
       }
     }, 3000);
     return () => {
@@ -216,7 +254,7 @@ function Pagelayout() {
       if (pollValue) {
         if (userIdValue) {
           // get from internal login.
-          debugger;
+
           const response = await newAxiosBase.post(
             "nonlmscommonlogin/pollInternalUserLoginData",
             {
@@ -225,7 +263,13 @@ function Pagelayout() {
             }
           );
           userSessionData = response.data;
-          setLatestSessionData(userSessionData);
+          if (
+            !String(window.location.pathname).includes(
+              btoa("DASHBOARDREDIRECT")
+            )
+          ) {
+            setLatestSessionData(userSessionData);
+          }
         } else {
           // mobile number value.
           const response = await newAxiosBase.post(
@@ -236,25 +280,109 @@ function Pagelayout() {
             }
           );
           userSessionData = response.data;
-          setLatestSessionData(userSessionData);
+          if (
+            !String(window.location.pathname).includes(
+              btoa("DASHBOARDREDIRECT")
+            )
+          ) {
+            setLatestSessionData(userSessionData);
+          }
         }
 
         if (
-          !(
-            JSON.stringify(currentTabConfigDt) ===
-              JSON.stringify(userSessionData.configDt) &&
-            JSON.stringify(currentTabrandomKeyDt) ===
-              JSON.stringify(userSessionData.randomKey) &&
-            JSON.stringify(atob(String(activeSessionTabId))) ===
-              JSON.stringify(userSessionData.sessionActiveTabId)
-          )
+          String(window.location.pathname).includes(btoa("DASHBOARDREDIRECT"))
         ) {
-          // when not equal route to login page.
-          clearInterval(countDown);
-          localStorage.removeItem(
-            userIdValue ? String(userIdValue) : String(mobileNumberValue)
-          );
-          handleLogout(false);
+          // for dashboard access type poll the dashboard data also & compare the dashboard session id with letter generation id.
+          let dashboardSessionData;
+
+          if (userIdValue) {
+            // get from internal login.
+
+            const commonDashboardResponse = await newAxiosBase.post(
+              "nonlmscommonlogin/pollInternalUserLoginData",
+              {
+                userId: atob(userIdValue),
+                subProduct: "COMMON_DASHBOARD",
+              }
+            );
+
+            dashboardSessionData = commonDashboardResponse.data;
+            setInitialPollAfterLoad(false);
+
+            if (
+              userSessionData.configDt &&
+              userSessionData.randomKey &&
+              !(
+                JSON.stringify(dashboardSessionData.configDt) ===
+                  JSON.stringify(userSessionData.configDt) &&
+                JSON.stringify(dashboardSessionData.randomKey) ===
+                  JSON.stringify(userSessionData.randomKey) &&
+                JSON.stringify(dashboardSessionData.sessionActiveTabId) ===
+                  JSON.stringify(userSessionData.sessionActiveTabId)
+              )
+            ) {
+              // when not equal route to login page.
+              clearInterval(countDown);
+              localStorage.removeItem(
+                userIdValue ? String(userIdValue) : String(mobileNumberValue)
+              );
+
+              handleLogout(false);
+            }
+          } else {
+            // mobile number value.
+            const commonDashboardResponse = await newAxiosBase.post(
+              "nonlmscommonlogin/pollExternalUserLoginData",
+              {
+                mobileNumber: atob(String(mobileNumberValue)),
+                subProduct: "COMMON_DASHBOARD",
+              }
+            );
+            dashboardSessionData = commonDashboardResponse.data;
+            setInitialPollAfterLoad(false);
+
+            if (
+              userSessionData.configDt &&
+              userSessionData.randomKey &&
+              !(
+                JSON.stringify(dashboardSessionData.configDt) ===
+                  JSON.stringify(userSessionData.configDt) &&
+                JSON.stringify(dashboardSessionData.randomKey) ===
+                  JSON.stringify(userSessionData.randomKey) &&
+                JSON.stringify(dashboardSessionData.sessionActiveTabId) ===
+                  JSON.stringify(userSessionData.sessionActiveTabId)
+              )
+            ) {
+              // when not equal route to login page.
+              clearInterval(countDown);
+              localStorage.removeItem(
+                userIdValue ? String(userIdValue) : String(mobileNumberValue)
+              );
+
+              handleLogout(false);
+            }
+          }
+        } else {
+          // normal polling & comparison for direct url access.
+          setInitialPollAfterLoad(false);
+          if (
+            !(
+              JSON.stringify(currentTabConfigDt) ===
+                JSON.stringify(userSessionData.configDt) &&
+              JSON.stringify(currentTabrandomKeyDt) ===
+                JSON.stringify(userSessionData.randomKey) &&
+              JSON.stringify(atob(String(activeSessionTabId))) ===
+                JSON.stringify(userSessionData.sessionActiveTabId)
+            )
+          ) {
+            // when not equal route to login page.
+            clearInterval(countDown);
+            localStorage.removeItem(
+              userIdValue ? String(userIdValue) : String(mobileNumberValue)
+            );
+
+            handleLogout(false);
+          }
         }
       }
     }, 5000);
@@ -292,47 +420,87 @@ function Pagelayout() {
       // dashboard page
       let userSessionData;
 
-      if (userIdValue) {
-        // get from internal login.
-        const response = await newAxiosBase.post(
-          "nonlmscommonlogin/getInternalUserLoginData",
-          {
-            userId: atob(userIdValue),
-            subProduct: "LETTER_GENERATION",
-          }
-        );
-        userSessionData = response.data;
+      if (
+        String(window.location.pathname).includes(btoa("DASHBOARDREDIRECT"))
+      ) {
+        // when data is parsed properly & the url contains the dashboard redirect.
+        // then insert this new session for subproduct to the db.
+        // now store the data to backend table.
+
+        // poll the dashboard date once for key comparision.
+        let dashboardSessionData;
+        if (userIdValue) {
+          // get from internal login.
+
+          const response = await newAxiosBase.post(
+            "nonlmscommonlogin/pollInternalUserLoginData",
+            {
+              userId: atob(userIdValue),
+              subProduct: "COMMON_DASHBOARD",
+            }
+          );
+          dashboardSessionData = response.data;
+        } else {
+          // mobile number value.
+          const response = await newAxiosBase.post(
+            "nonlmscommonlogin/pollExternalUserLoginData",
+            {
+              mobileNumber: atob(String(mobileNumberValue)),
+              subProduct: "COMMON_DASHBOARD",
+            }
+          );
+          dashboardSessionData = response.data;
+        }
 
         if (
-          atob(String(activeSessionTabId)) ===
-          userSessionData.sessionActiveTabId
+          atob(atob(String(activeSessionTabId))) ===
+          dashboardSessionData.sessionActiveTabId
         ) {
-          try {
-            JSON.parse(
-              CryptoJS.AES.decrypt(
-                atob(userSessionData.configDt),
-                atob(userSessionData.randomKey)
-              ).toString(CryptoJS.enc.Utf8)
-            );
+          const saveResponse = await axios.post(
+            "nonlmscommonlogin/storeInternalUserLoginData",
+            {
+              userId: userIdValue ? userIdValue : mobileNumberValue,
+              randomKey: dashboardSessionData.randomKey,
+              configDt: dashboardSessionData.configDt,
+              sessionActiveTabId: btoa(dashboardSessionData.sessionActiveTabId),
+              subProduct: "LETTER_GENERATION",
+              sessionAccessType: "DASHBOARD_ACCESS",
+              createdOn: new Date(),
+            }
+          );
 
-            let sessionData = {
-              encodedConfigDtKey: userSessionData.configDt,
-              encodedRandomKey: userSessionData.randomKey,
-              encodedActiveSessionTabId: btoa(
-                userSessionData.sessionActiveTabId
-              ),
-            };
+          if (saveResponse.status === 200) {
+            try {
+              JSON.parse(
+                CryptoJS.AES.decrypt(
+                  atob(dashboardSessionData.configDt),
+                  atob(dashboardSessionData.randomKey)
+                ).toString(CryptoJS.enc.Utf8)
+              );
 
-            localStorage.setItem(userIdValue, JSON.stringify(sessionData));
-            setTimeout(() => {
-              setLoading(false);
-              setStartPoll(true);
-            }, 3000);
-          } catch (error) {
-            console.log(error);
-            setTimeout(() => {
-              window.open(loginUrl, "_self");
-            }, 5000);
+              let sessionData = {
+                encodedConfigDtKey: dashboardSessionData.configDt,
+                encodedRandomKey: dashboardSessionData.randomKey,
+                encodedActiveSessionTabId: btoa(
+                  dashboardSessionData.sessionActiveTabId
+                ),
+              };
+
+              localStorage.setItem(userIdValue, JSON.stringify(sessionData));
+              setTimeout(() => {
+                setLoading(false);
+                setStartPoll(true);
+              }, 3000);
+            } catch (error) {
+              console.log(error);
+
+              setTimeout(() => {
+                window.open(loginUrl, "_self");
+              }, 5000);
+            }
+          } else {
+            // for when dashbaord access type ->  sub product was not able to insert then handle auto logout of subproduct.
+            handleLogout(false);
           }
         } else {
           setTimeout(() => {
@@ -340,52 +508,103 @@ function Pagelayout() {
           }, 5000);
         }
       } else {
-        // get from external login details.
-        const response = await newAxiosBase.post(
-          "nonlmscommonlogin/getExternalUserLoginData",
-          {
-            mobileNumber: atob(String(mobileNumberValue)),
-            subProduct: "LETTER_GENERATION",
-          }
-        );
-        userSessionData = response.data;
-        if (
-          atob(String(activeSessionTabId)) ===
-          userSessionData.sessionActiveTabId
-        ) {
-          try {
-            JSON.parse(
-              CryptoJS.AES.decrypt(
-                atob(userSessionData.configDt),
-                atob(userSessionData.randomKey)
-              ).toString(CryptoJS.enc.Utf8)
-            );
+        // considered as direct url access for letter generation
+        if (userIdValue) {
+          // get from internal login.
+          const response = await newAxiosBase.post(
+            "nonlmscommonlogin/getInternalUserLoginData",
+            {
+              userId: atob(userIdValue),
+              subProduct: "LETTER_GENERATION",
+            }
+          );
+          userSessionData = response.data;
 
-            let sessionData = {
-              encodedConfigDtKey: userSessionData.configDt,
-              encodedRandomKey: userSessionData.randomKey,
-              encodedActiveSessionTabId: btoa(
-                userSessionData.sessionActiveTabId
-              ),
-            };
+          if (
+            atob(String(activeSessionTabId)) ===
+            userSessionData.sessionActiveTabId
+          ) {
+            try {
+              JSON.parse(
+                CryptoJS.AES.decrypt(
+                  atob(userSessionData.configDt),
+                  atob(userSessionData.randomKey)
+                ).toString(CryptoJS.enc.Utf8)
+              );
 
-            localStorage.setItem(
-              String(mobileNumberValue),
-              JSON.stringify(sessionData)
-            );
-            setTimeout(() => {
-              setLoading(false);
-              setStartPoll(true);
-            }, 3000);
-          } catch (error) {
+              let sessionData = {
+                encodedConfigDtKey: userSessionData.configDt,
+                encodedRandomKey: userSessionData.randomKey,
+                encodedActiveSessionTabId: btoa(
+                  userSessionData.sessionActiveTabId
+                ),
+              };
+
+              localStorage.setItem(userIdValue, JSON.stringify(sessionData));
+              setTimeout(() => {
+                setLoading(false);
+                setStartPoll(true);
+              }, 3000);
+            } catch (error) {
+              console.log(error);
+              setTimeout(() => {
+                window.open(loginUrl, "_self");
+              }, 5000);
+            }
+          } else {
             setTimeout(() => {
               window.open(loginUrl, "_self");
             }, 5000);
           }
         } else {
-          setTimeout(() => {
-            window.open(loginUrl, "_self");
-          }, 5000);
+          // get from external login details.
+          const response = await newAxiosBase.post(
+            "nonlmscommonlogin/getExternalUserLoginData",
+            {
+              mobileNumber: atob(String(mobileNumberValue)),
+              subProduct: "LETTER_GENERATION",
+            }
+          );
+          userSessionData = response.data;
+          if (
+            atob(String(activeSessionTabId)) ===
+            userSessionData.sessionActiveTabId
+          ) {
+            try {
+              JSON.parse(
+                CryptoJS.AES.decrypt(
+                  atob(userSessionData.configDt),
+                  atob(userSessionData.randomKey)
+                ).toString(CryptoJS.enc.Utf8)
+              );
+
+              let sessionData = {
+                encodedConfigDtKey: userSessionData.configDt,
+                encodedRandomKey: userSessionData.randomKey,
+                encodedActiveSessionTabId: btoa(
+                  userSessionData.sessionActiveTabId
+                ),
+              };
+
+              localStorage.setItem(
+                String(mobileNumberValue),
+                JSON.stringify(sessionData)
+              );
+
+              setTimeout(() => {
+                setLoading(false);
+                setStartPoll(true);
+              }, 3000);
+            } catch (error) {
+              setTimeout(() => {
+                window.open(loginUrl, "_self");
+              }, 5000);
+            }
+          } else {
+            setTimeout(() => {
+              window.open(loginUrl, "_self");
+            }, 5000);
+          }
         }
       }
     };
@@ -772,22 +991,48 @@ function Pagelayout() {
           <>
             <Routes>
               <Route
+                exact
+                path={`letterGenerationCreate/${encodedDashboardRedirect}:${encodedDashboardRedirect}/${encodedUserId}:${encodedUserId}/${encodedActiveSessionTabId}:${encodedActiveSessionTabId}`}
+                element={<TextEditor />}
+              />
+              <Route
+                exact
                 path={`letterGenerationCreate/${encodedUserId}:${encodedUserId}/${encodedActiveSessionTabId}:${encodedActiveSessionTabId}`}
                 element={<TextEditor />}
               />
               <Route
-                path={`letterGenerationCreate/${encodedMobileNumber}:${encodedMobileNumber}/${encodedActiveSessionTabId}:${encodedActiveSessionTabId}`}
+                exact
+                path={`letterGenerationCreate/${encodedDashboardRedirect}:${encodedDashboardRedirect}/${encodedMobileNumber}:${encodedMobileNumber}/${encodedActiveSessionTabId}:${encodedActiveSessionTabId}`}
                 element={<TextEditor />}
               />
               <Route
-                path={`letterGenerationTrigger/${encodedUserId}:${encodedUserId}/${encodedActiveSessionTabId}:${encodedActiveSessionTabId}`}
+                exact
+                path={`letterGenerationCreate/${encodedMobileNumber}:${encodedMobileNumber}/${encodedActiveSessionTabId}:${encodedActiveSessionTabId}`}
+                element={<TextEditor />}
+              />
+
+              <Route
+                exact
+                path={`letterGenerationTrigger/${encodedDashboardRedirect}:${encodedDashboardRedirect}/${encodedUserId}:${encodedUserId}/${encodedActiveSessionTabId}:${encodedActiveSessionTabId}`}
                 element={<TriggerView />}
               />
               <Route
+                exact
+                path={`letterGenerationTrigger/${encodedUserId}:${encodedUserId}/${encodedActiveSessionTabId}:${encodedActiveSessionTabId}`}
+                element={<TriggerView />}
+              />
+
+              <Route
+                exact
+                path={`letterGenerationTrigger/${encodedDashboardRedirect}:${encodedDashboardRedirect}/${encodedMobileNumber}:${encodedMobileNumber}/${encodedActiveSessionTabId}:${encodedActiveSessionTabId}`}
+                element={<TriggerView />}
+              />
+              <Route
+                exact
                 path={`letterGenerationTrigger/${encodedMobileNumber}:${encodedMobileNumber}/${encodedActiveSessionTabId}:${encodedActiveSessionTabId}`}
                 element={<TriggerView />}
               />
-              <Route path="*" exact={true} element={<PageNotFound />} />
+              <Route path="*" exact element={<PageNotFound />} />
             </Routes>
           </>
         )}
