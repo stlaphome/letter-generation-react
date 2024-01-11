@@ -314,8 +314,6 @@ function Pagelayout() {
             setInitialPollAfterLoad(false);
 
             if (
-              userSessionData.configDt &&
-              userSessionData.randomKey &&
               !(
                 JSON.stringify(dashboardSessionData.configDt) ===
                   JSON.stringify(userSessionData.configDt) &&
@@ -349,8 +347,6 @@ function Pagelayout() {
             setInitialPollAfterLoad(false);
 
             if (
-              userSessionData.configDt &&
-              userSessionData.randomKey &&
               !(
                 JSON.stringify(dashboardSessionData.configDt) ===
                   JSON.stringify(userSessionData.configDt) &&
@@ -728,6 +724,9 @@ function Pagelayout() {
   };
 
   const tabCloseLogout = async () => {
+    let newAxiosBase = { ...axios };
+    newAxiosBase.defaults.baseURL =
+      process.env.REACT_APP_NON_LMS_COMMON_LOGIN_BACKEND_SERVER;
     const urlParamValues = getUrlParamValues();
     const userIdValue = urlParamValues[encodedUserId];
     const mobileNumberValue = urlParamValues[encodedMobileNumber];
