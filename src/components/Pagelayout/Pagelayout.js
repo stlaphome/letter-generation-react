@@ -303,8 +303,6 @@ function Pagelayout() {
             setInitialPollAfterLoad(false);
 
             if (
-              userSessionData.configDt &&
-              userSessionData.randomKey &&
               !(
                 JSON.stringify(dashboardSessionData.configDt) ===
                   JSON.stringify(userSessionData.configDt) &&
