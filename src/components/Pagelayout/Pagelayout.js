@@ -195,7 +195,7 @@ function Pagelayout() {
             );
             // false means -> it was not a manual trigger this indicates the backend data should not delete & ui alone should route
             // since if i clear db new session also will logout.
-
+            tabCloseLogout();
             handleLogout(false);
           }
         } else {
@@ -271,11 +271,8 @@ function Pagelayout() {
             }
           );
           userSessionData = response.data;
-          if (
-            !String(window.location.pathname).includes("dashboard_redirect")
-          ) {
-            setLatestSessionData(userSessionData);
-          }
+
+          setLatestSessionData(userSessionData);
         } else {
           // mobile number value.
           const response = await newAxiosBase.post(
@@ -287,11 +284,8 @@ function Pagelayout() {
             }
           );
           userSessionData = response.data;
-          if (
-            !String(window.location.pathname).includes("dashboard_redirect")
-          ) {
-            setLatestSessionData(userSessionData);
-          }
+
+          setLatestSessionData(userSessionData);
         }
 
         if (String(window.location.pathname).includes("dashboard_redirect")) {
@@ -331,6 +325,7 @@ function Pagelayout() {
                   : String(mobileNumberValue)) + "DASHBOARD_ACCESS"
               );
 
+              tabCloseLogout();
               handleLogout(false);
             }
           } else {
@@ -364,6 +359,7 @@ function Pagelayout() {
                   : String(mobileNumberValue)) + "DASHBOARD_ACCESS"
               );
 
+              tabCloseLogout();
               handleLogout(false);
             }
           }
@@ -640,6 +636,9 @@ function Pagelayout() {
   const [loading, setLoading] = useState(true);
 
   const handleLogout = async (manualtrigger) => {
+    let newAxiosBase = { ...axios };
+    newAxiosBase.defaults.baseURL =
+      process.env.REACT_APP_NON_LMS_COMMON_LOGIN_BACKEND_SERVER;
     if (manualtrigger) {
       const urlParamValues = getUrlParamValues();
       const userIdValue = urlParamValues[encodedUserId];
@@ -730,7 +729,12 @@ function Pagelayout() {
     const urlParamValues = getUrlParamValues();
     const userIdValue = urlParamValues[encodedUserId];
     const mobileNumberValue = urlParamValues[encodedMobileNumber];
-    const activeSessionTabId = urlParamValues[encodedActiveSessionTabId];
+    let activeSessionTabId = urlParamValues[encodedActiveSessionTabId];
+    activeSessionTabId = String(window.location.pathname).includes(
+      "dashboard_redirect"
+    )
+      ? atob(activeSessionTabId)
+      : activeSessionTabId;
 
     // tab close event can be triggered for the manual tab close or auto logout also when a new session started also.
     // get from internal login.
