@@ -267,6 +267,7 @@ function Pagelayout() {
             {
               userId: atob(userIdValue),
               subProduct: "LETTER_GENERATION",
+              pollType: "SELF_POLL",
             }
           );
           userSessionData = response.data;
@@ -282,6 +283,7 @@ function Pagelayout() {
             {
               mobileNumber: atob(String(mobileNumberValue)),
               subProduct: "LETTER_GENERATION",
+              pollType: "SELF_POLL",
             }
           );
           userSessionData = response.data;
@@ -304,6 +306,7 @@ function Pagelayout() {
               {
                 userId: atob(userIdValue),
                 subProduct: "COMMON_DASHBOARD",
+                pollType: "NONSELF_POLL",
               }
             );
 
@@ -339,6 +342,7 @@ function Pagelayout() {
               {
                 mobileNumber: atob(String(mobileNumberValue)),
                 subProduct: "COMMON_DASHBOARD",
+                pollType: "NONSELF_POLL",
               }
             );
             dashboardSessionData = commonDashboardResponse.data;
@@ -441,6 +445,7 @@ function Pagelayout() {
             {
               userId: atob(userIdValue),
               subProduct: "COMMON_DASHBOARD",
+              pollType: "NONSELF_POLL",
             }
           );
           dashboardSessionData = response.data;
@@ -451,6 +456,7 @@ function Pagelayout() {
             {
               mobileNumber: atob(String(mobileNumberValue)),
               subProduct: "COMMON_DASHBOARD",
+              pollType: "NONSELF_POLL",
             }
           );
           dashboardSessionData = response.data;
