@@ -73,7 +73,7 @@ function Pagelayout() {
   const [anchorEl, setAnchorEl] = React.useState(null);
 
   const [openLetterGenerationSubMenu, setOpenLetterGenerationSubMenu] =
-    useState(false);
+    useState(true);
   const navigate = useNavigate();
   const { search } = useLocation();
   const deviceModeValue = useMediaQuery("(max-width:1200px)");
