@@ -167,7 +167,10 @@ function Pagelayout() {
       const initialPollAfterLoadValue = new Boolean(initialPollAfterLoad);
       if (pollValue) {
         const sessionDataString = localStorage.getItem(
-          userIdValue ? String(userIdValue) : String(mobileNumberValue)
+          (userIdValue ? String(userIdValue) : String(mobileNumberValue)) +
+            (String(window.location.pathname).includes("dashboard_redirect")
+              ? "DASHBOARD_ACCESS"
+              : "DIRECT_URL_ACCESS")
         );
         const sessionData = sessionDataString
           ? JSON.parse(sessionDataString)
@@ -187,7 +190,8 @@ function Pagelayout() {
 
             clearInterval(uiPollCountDown);
             localStorage.removeItem(
-              userIdValue ? String(userIdValue) : String(mobileNumberValue)
+              (userIdValue ? String(userIdValue) : String(mobileNumberValue)) +
+                "DASHBOARD_ACCESS"
             );
             // false means -> it was not a manual trigger this indicates the backend data should not delete & ui alone should route
             // since if i clear db new session also will logout.
@@ -204,7 +208,8 @@ function Pagelayout() {
 
             clearInterval(uiPollCountDown);
             localStorage.removeItem(
-              userIdValue ? String(userIdValue) : String(mobileNumberValue)
+              (userIdValue ? String(userIdValue) : String(mobileNumberValue)) +
+                "DIRECT_URL_ACCESS"
             );
             // false means -> it was not a manual trigger this indicates the backend data should not delete & ui alone should route
             // since if i clear db new session also will logout.
@@ -242,7 +247,10 @@ function Pagelayout() {
       newAxiosBase.defaults.baseURL =
         process.env.REACT_APP_NON_LMS_COMMON_LOGIN_BACKEND_SERVER;
       const sessionDataString = localStorage.getItem(
-        userIdValue ? String(userIdValue) : String(mobileNumberValue)
+        (userIdValue ? String(userIdValue) : String(mobileNumberValue)) +
+          (String(window.location.pathname).includes("dashboard_redirect")
+            ? "DASHBOARD_ACCESS"
+            : "DIRECT_URL_ACCESS")
       );
       const sessionData = sessionDataString
         ? JSON.parse(sessionDataString)
@@ -317,7 +325,9 @@ function Pagelayout() {
               // when not equal route to login page.
               clearInterval(countDown);
               localStorage.removeItem(
-                userIdValue ? String(userIdValue) : String(mobileNumberValue)
+                (userIdValue
+                  ? String(userIdValue)
+                  : String(mobileNumberValue)) + "DASHBOARD_ACCESS"
               );
 
               handleLogout(false);
@@ -349,7 +359,9 @@ function Pagelayout() {
               // when not equal route to login page.
               clearInterval(countDown);
               localStorage.removeItem(
-                userIdValue ? String(userIdValue) : String(mobileNumberValue)
+                (userIdValue
+                  ? String(userIdValue)
+                  : String(mobileNumberValue)) + "DASHBOARD_ACCESS"
               );
 
               handleLogout(false);
@@ -371,7 +383,8 @@ function Pagelayout() {
             // when not equal route to login page.
             clearInterval(countDown);
             localStorage.removeItem(
-              userIdValue ? String(userIdValue) : String(mobileNumberValue)
+              (userIdValue ? String(userIdValue) : String(mobileNumberValue)) +
+                "DIRECT_URL_ACCESS"
             );
 
             handleLogout(false);
@@ -477,7 +490,11 @@ function Pagelayout() {
                 ),
               };
 
-              localStorage.setItem(userIdValue, JSON.stringify(sessionData));
+              localStorage.setItem(
+                (userIdValue ? userIdValue : mobileNumberValue) +
+                  "DASHBOARD_ACCESS",
+                JSON.stringify(sessionData)
+              );
               setTimeout(() => {
                 setLoading(false);
                 setStartPoll(true);
@@ -531,7 +548,10 @@ function Pagelayout() {
                 ),
               };
 
-              localStorage.setItem(userIdValue, JSON.stringify(sessionData));
+              localStorage.setItem(
+                userIdValue + "DIRECT_URL_ACCESS",
+                JSON.stringify(sessionData)
+              );
               setTimeout(() => {
                 setLoading(false);
                 setStartPoll(true);
@@ -578,7 +598,7 @@ function Pagelayout() {
               };
 
               localStorage.setItem(
-                String(mobileNumberValue),
+                String(mobileNumberValue) + "DIRECT_URL_ACCESS",
                 JSON.stringify(sessionData)
               );
 
