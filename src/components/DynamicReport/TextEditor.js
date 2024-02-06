@@ -310,7 +310,17 @@ const TextEditor = () => {
               <CustomDropDown
                 label="Product Type"
                 required={true}
-                dropDownValue={reportScreen.productTypeList}
+                dropDownValue={
+                  String(window.location.pathname).includes(
+                    "dashboard_redirect"
+                  ) ? reportScreen.productTypeList &&
+                  reportScreen.productTypeList.filter(product => product.text === "HOMEFIN") :
+                    String(window.location.pathname).includes(
+                      "stlap_redirect"
+                    ) ? reportScreen.productTypeList && 
+                    reportScreen.productTypeList.filter(product => product.text === "STLAP") 
+                    : reportScreen.productTypeList
+                }
                 variant="standard"
                 defaultValue="1"
                 value={reportScreen.productType}
