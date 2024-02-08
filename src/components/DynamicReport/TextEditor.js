@@ -57,6 +57,12 @@ const TextEditor = () => {
   const save = async () => {
     if (editorRef.current) {
       try {
+        const htmlContent = (editorRef.current.getContent());
+        let htmlContentString = htmlContent.toString();
+        const replaceContent = htmlContentString.replace(/\\"/g, '"');
+        let replacedString = htmlContentString.replace(/\(/g, "[");
+
+
         dispatch(DynamicReportReducerAction.updateLoading(true));
         if (!reportScreen.reportList.includes(reportScreen.templateName)) {
           var dataList = [...reportScreen.reportList];
@@ -70,12 +76,12 @@ const TextEditor = () => {
             templateHeaderKey: reportScreen.templateHeaderKey,
             templateName: reportScreen.templateName,
             templateKey: reportScreen.templateKey,
-            content: editorRef.current.getContent(),
+            content: replacedString,
             active: reportScreen.active,
             userName: userName,
             mode: reportScreen.mode,
-         
           }
+         
         );
 
         if (response.status === 200) {
@@ -104,7 +110,28 @@ const TextEditor = () => {
             }, 1000);
           }
         }
-      } catch {}
+      } catch(error) {
+        console.error(error);
+        dispatch(DynamicReportReducerAction.updateLoading(false));
+        if (error.response) {
+          // The request was made, but the server responded with a status code other than 200
+          console.error('Response Error:', error.response.data);
+        } else if (error.request) {
+          // The request was made but no response was received
+          console.error('Request Error:', error.request);
+        } else {
+          // Something happened in setting up the request that triggered an Error
+          console.error('Error:', error.message);
+        }
+        dispatch(
+          DynamicReportReducerAction.updateSnackBarMessage("Failed to save template")
+        );
+        dispatch(
+          DynamicReportReducerAction.updateSnackBarAlertType("error")
+        );
+        openAlertHandler();
+       
+      }
     }
   };
 
@@ -198,6 +225,27 @@ const TextEditor = () => {
   const [mode, setMode] = useState([]);
   const [productTypeList, setProductTypeList] = useState([]);
   const [productType, setProductType] = useState(null);
+
+  const [isEditorReady, setIsEditorReady] = useState(false);
+
+  const handleEditorChange = (content, editor) => {
+    console.log('Content was updated:', content);
+    //editorRef.current = editor;
+   // editorRef.current.setContent(content);
+  };
+
+  const handleEditorInit = (evt,editor) => {
+    setIsEditorReady(true);
+    editorRef.current = editor;
+  };
+
+  const handleEditorError = (error) => {
+    // Handle initialization errors, e.g., expired API key
+    console.error('Error initializing TinyMCE:', error);
+    // You can notify the user or take appropriate actions
+  };
+
+
   useEffect(() => {
     getProductTypeList();
     getLovMasterData();
@@ -223,9 +271,9 @@ const TextEditor = () => {
   };
   // Load values from the LOV Master API.
   const getLovMasterData = async () => {
-    let newAxiosBase = { ...axios };
-    newAxiosBase.defaults.baseURL = process.env.REACT_APP_STLAP_LMS_BACKEND;
-    const letterGenerationLovData = await axios.post(
+    let newAxiosBaseValue = { ...axios };
+    newAxiosBaseValue.defaults.baseURL = process.env.REACT_APP_STLAP_LMS_BACKEND;
+    const letterGenerationLovData = await newAxiosBaseValue.post(
       "/lovMaster/getLovValues",
       {
         // moduleid to be given on special access level based on that  will update here.
@@ -507,21 +555,24 @@ const TextEditor = () => {
       >
         <Editor
           disabled={reportScreen.saveButtonDisable}
-          apiKey="9pa9ukph5reuk9a90z4081x77tarumht24mejqod8iix10bm"
-          onInit={(evt, editor) => (editorRef.current = editor)}
+          apiKey="4qd053u9x8lto9yrxg5qibw5ra58q1x1sbmk29s1kn9xph7j"
+          onInit={handleEditorInit}
+          onEditorChange={handleEditorChange}
+          onError={handleEditorError}
           initialValue=""
           init={{
             height: 400,
             menubar: true,
             font_family_formats:
               "Andale Mono=andale mono,times; Arial=arial,helvetica,sans-serif; Arial Black=arial black,avant garde; Book Antiqua=book antiqua,palatino; Calibri=Calibri;  Comic Sans MS=comic sans ms,sans-serif; Courier New=courier new,courier; Georgia=georgia,palatino; Helvetica=helvetica; Impact=impact,chicago; Symbol=symbol; Tahoma=tahoma,arial,helvetica,sans-serif; Terminal=terminal,monaco; Times New Roman=times new roman,times; Trebuchet MS=trebuchet ms,geneva; Verdana=verdana,geneva; Webdings=webdings; Wingdings=wingdings,zapf dingbats",
-            plugins:
+              plugins:
               "nonbreaking preview searchreplace autolink directionality visualblocks visualchars image link media codesample table charmap pagebreak nonbreaking anchor insertdatetime advlist lists wordcount help charmap  linkchecker emoticons autosave",
             toolbar:
               "nonbreaking undo redo spellcheckdialog formatpainter | blocks fontfamily fontsize | bold italic underline forecolor backcolor | link image addcomment showcomments  | alignleft aligncenter alignright alignjustify lineheight | bullist numlist indent outdent | removeformat",
             toolbar_sticky: true,
             nonbreaking_force_tab: true,
-            removed_menuitems: "newdocument print",
+            pagebreak_separator: '<div style="page-break-before: always;"></div>',
+            removed_menuitems: "newdocument print"
           }}
         />
       </AccordianContainer>
