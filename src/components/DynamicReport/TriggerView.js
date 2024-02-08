@@ -39,6 +39,7 @@ const TriggerView = () => {
   const [filesList, setFilesList] = useState({});
   const [contactList, setContactList] = useState({});
   const [apllicationNumberDisable, setApllicationNumberDisable] = useState(false);
+  const [sanctionDateError, setSanctionDateError] = useState(false);
   const [sanctionDateDisable, setSanctionDateDisable] = useState(false);
   const [showNotificationDialog, setShowNotificationDialog] = useState(false);
   const [mailSubject, setMailSubject] = useState(
@@ -125,11 +126,11 @@ const TriggerView = () => {
 
   useEffect(() => {
     getProductTypeList();
-   
     return () => {
       dispatch(DynamicReportReducerAction.resetForTrigger());
     };
   }, []);
+
   const getProductTypeList = async () => {
     dispatch(DynamicReportReducerAction.updateLoading(true));
     const response = await newAxiosBase.post(
@@ -145,6 +146,9 @@ const TriggerView = () => {
  
     
   const fetchDataBasedOnDB=async (value,key)=>{
+    let newAxiosBase = { ...axios };
+  newAxiosBase.defaults.baseURL =
+    process.env.REACT_APP_STLAP_LETTER_GENERATION_BACKEND;
     if(value===null){
       return;
     }
@@ -156,7 +160,20 @@ const TriggerView = () => {
     }
     if(key==="date"){
       if(dayjs(value).format("DD/MM/YYYY")!=="Invalid Date"){
-        paramMap['sanctionDate'] = dayjs(value).format("DD/MM/YYYY")
+      let dateValue = new Date(value);
+      const options = {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+      };
+      const formattedDate = dateValue.toLocaleDateString('en-GB', options);
+
+        paramMap['sanctionDate'] =formattedDate.toString();
+        setSanctionDateError(false);
+      }else{
+        dispatch(DynamicReportReducerAction.updateLoading(false));
+        setSanctionDateError(true);
+        return;
       }
      }else{
       paramMap['applicationNumber']=value;
@@ -224,7 +241,9 @@ const TriggerView = () => {
   };
 
   const onGenerateButtonClick = async () => {
-   
+    let newAxiosBase = { ...axios };
+  newAxiosBase.defaults.baseURL =
+    process.env.REACT_APP_STLAP_LETTER_GENERATION_BACKEND;
     if (triggerScreen.templateName === "") {
       setErrorExists({
         value: true,
@@ -311,6 +330,9 @@ const TriggerView = () => {
 
   const onPdfButtonCLick = async (value) => {
     dispatch(DynamicReportReducerAction.updateLoading(true));
+    let newAxiosBase = { ...axios };
+    newAxiosBase.defaults.baseURL =
+      process.env.REACT_APP_STLAP_LETTER_GENERATION_BACKEND;
     const response = await newAxiosBase.post(
       "/dynamicTemplate/getGeneratedFile",
       {
@@ -466,6 +488,16 @@ const TriggerView = () => {
                       newValue
                     )
                   )
+                  dispatch(
+                    DynamicReportReducerAction.updateApplicationNumberForTrigger(
+                      ""
+                    )
+                  )
+                  dispatch(
+                    DynamicReportReducerAction.updateSanctionDateForTrigger(
+                      ""
+                    )
+                  )
                 
                 }
                 }
@@ -535,6 +567,9 @@ const TriggerView = () => {
                       }
                 }}
               />
+               {sanctionDateError && (
+              <p className="error">Please Enter Valid Date</p>
+            )}
             </Grid>
           </Grid>
           {errorExists.value && (
@@ -600,50 +635,8 @@ const TriggerView = () => {
                 {rows}
               </Button>
             ))}
-            <Box
-              sx={{
-                marginTop: "8px",
-                marginBottom: "0px",
-                display: "flex",
-                justifyContent: "center",
-              }}
-            >
-              <Stack
-                direction="row"
-                spacing={1}
-                alignItems="center"
-                marginRight={"3%"}
-              >
-                <Typography>Notification Type : SMS</Typography>
-                <AntSwitch
-                  inputProps={{ "aria-label": "ant design" }}
-                  checked={triggerScreen.notificationType === "E-Mail"}
-                  onChange={(event) => {
-                    dispatch(
-                      DynamicReportReducerAction.updateNotificationTypeForTrigger(
-                        triggerScreen.notificationType === "E-Mail"
-                          ? "SMS"
-                          : "E-Mail"
-                      )
-                    );
-                  }}
-                />
-                <Typography>E-Mail</Typography>
-              </Stack>
-              <Button
-                variant="contained"
-                type="submit"
-                sx={{ height: "2rem", marginRight: "2%" }}
-                disabled={false}
-                onClick={() => {
-                  setShowNotificationDialog(true);
-                }}
-              >
-                Send Notification
-              </Button>
             </Box>
-          </Box>
-        </AccordianContainer>
+                    </AccordianContainer>
       )}
 
       <CustomConfirmationDialog
