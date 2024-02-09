@@ -453,7 +453,7 @@ const TriggerView = () => {
                   ) ? triggerScreen.productTypeList &&
                   triggerScreen.productTypeList.filter(product => product.text === "HOMEFIN") :
                     String(window.location.pathname).includes(
-                      "stlap_redirect"
+                      "stlap"
                     ) ? triggerScreen.productTypeList && 
                     triggerScreen.productTypeList.filter(product => product.text === "STLAP") 
                     : triggerScreen.productTypeList

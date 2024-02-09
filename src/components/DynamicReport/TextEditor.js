@@ -364,7 +364,7 @@ const TextEditor = () => {
                   ) ? reportScreen.productTypeList &&
                   reportScreen.productTypeList.filter(product => product.text === "HOMEFIN") :
                     String(window.location.pathname).includes(
-                      "stlap_redirect"
+                      "stlap"
                     ) ? reportScreen.productTypeList && 
                     reportScreen.productTypeList.filter(product => product.text === "STLAP") 
                     : reportScreen.productTypeList
