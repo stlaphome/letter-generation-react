@@ -11,6 +11,7 @@ import {
   Snackbar,
   TextField,
   Typography,
+  useStepContext,
 } from "@mui/material";
 import Checkbox from "@mui/material/Checkbox";
 import { Editor } from "@tinymce/tinymce-react";
@@ -225,6 +226,7 @@ const TextEditor = () => {
   const [mode, setMode] = useState([]);
   const [productTypeList, setProductTypeList] = useState([]);
   const [productType, setProductType] = useState(null);
+  const [apikey,setApiKey] = useState("");
 
   const [isEditorReady, setIsEditorReady] = useState(false);
 
@@ -247,6 +249,7 @@ const TextEditor = () => {
 
 
   useEffect(() => {
+    getApiKeyValue();
     getProductTypeList();
     getLovMasterData();
     return () => {
@@ -316,7 +319,20 @@ const TextEditor = () => {
     else
       dispatch(DynamicReportReducerAction.updateSendMailButtonDisable(false));
   }
-
+const getApiKeyValue=async()=>{
+  dispatch(DynamicReportReducerAction.updateLoading(true));
+  let newAxiosBaseValue = { ...axios };
+  newAxiosBaseValue.defaults.baseURL =
+    process.env.REACT_APP_STLAP_LETTER_GENERATION_BACKEND;
+  const response = await newAxiosBaseValue.post(
+    "/dynamicTemplate/getAPIKey"
+  );
+  if (response.status === 200) {
+  dispatch(DynamicReportReducerAction.updateAPIKey(response.data))
+  dispatch(DynamicReportReducerAction.updateLoading(false));
+  }
+  dispatch(DynamicReportReducerAction.updateLoading(false));
+}
   const handleRenderInput = (params) => (
     <TextField
       {...params}
@@ -553,9 +569,10 @@ const TextEditor = () => {
         initialOpen={true}
         sx={{ margin: "8px !important" }}
       >
+      {reportScreen.apiKey!=="" &&
         <Editor
           disabled={reportScreen.saveButtonDisable}
-          apiKey="4qd053u9x8lto9yrxg5qibw5ra58q1x1sbmk29s1kn9xph7j"
+          apiKey={reportScreen.apiKey}
           onInit={handleEditorInit}
           onEditorChange={handleEditorChange}
           onError={handleEditorError}
@@ -575,6 +592,7 @@ const TextEditor = () => {
             removed_menuitems: "newdocument print"
           }}
         />
+      }
       </AccordianContainer>
 
       <Snackbar
