@@ -23,7 +23,8 @@ const initialState = {
     productCode:"",
     templateTypeList:[],
     templateType:"",
-    templateId:""
+    templateId:"",
+    apiKey:"",
   },
 
   triggerScreen: {
@@ -61,6 +62,7 @@ const DynamicReportReducer = createSlice({
     updateSnackBarAlert(state, action) {
       state.snackBarHandler.alert = action.payload;
     },
+  
     updateSnackBarMessage(state, action) {
       state.snackBarHandler.message = action.payload;
     },
@@ -80,6 +82,9 @@ const DynamicReportReducer = createSlice({
     updateTemplateKeys(state, action) {
       state.reportScreen.templateKeyList = action.payload.templateKeyList;
       state.reportScreen.templateKey = action.payload.templateKey;
+    },
+    updateAPIKey(state, action) {
+      state.reportScreen.apiKey = action.payload;
     },
     updateActive(state, action) {
       state.reportScreen.active = action.payload;
