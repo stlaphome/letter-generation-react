@@ -23,9 +23,42 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import CustomDropDown from "../CustomComponents/CustomDropDown";
 import { flushSync } from "react-dom";
-import styled from "@emotion/styled";
 import dayjs from "dayjs";
 import CustomConfirmationDialog from "../CustomComponents/CustomConfirmationDialog";
+import StlapFooter from '../CustomComponents/StlapFooter';
+
+import Checkbox from "@mui/material/Checkbox";
+import MuiAppBar from "@mui/material/AppBar";
+import Toolbar from "@mui/material/Toolbar";
+import { styled } from "@mui/material/styles";
+import Logo from "../../images/SF_Logo.png";
+import SFLogoSmall from "../../images/SFLogo.png";
+import {Tooltip,useMediaQuery} from "@mui/material";
+
+
+const desktopHeader = (
+  <>
+    <Stack direction="row" sx={{ width: "calc(100% - 600px)" }}>
+      <img height="36px" src={Logo} alt="No Logo"></img>
+    </Stack>          
+
+  </>
+);
+
+const mobileHeader = (
+  <>
+    <Stack direction="row" sx={{ width: "calc(100% - 600px)" }}>
+      <img
+        id="logoimage"
+        src={SFLogoSmall}
+        width={50}
+        height={50}
+        alt="No Logo"
+      ></img>
+    </Stack>
+  </>
+);
+
 
 const TriggerView = () => {
   const dispatch = useDispatch();
@@ -378,57 +411,28 @@ const TriggerView = () => {
     }
   };
 
-  const AntSwitch = styled(Switch)(({ theme }) => ({
-    width: 28,
-    height: 16,
-    padding: 0,
-    display: "flex",
-    "&:active": {
-      "& .MuiSwitch-thumb": {
-        width: 15,
-      },
-      "& .MuiSwitch-switchBase.Mui-checked": {
-        transform: "translateX(9px)",
-      },
-    },
-    "& .MuiSwitch-switchBase": {
-      padding: 2,
-      "&.Mui-checked": {
-        transform: "translateX(12px)",
-        color: "#fff",
-        "& + .MuiSwitch-track": {
-          opacity: 1,
-          backgroundColor:
-            theme.palette.mode === "dark" ? "#177ddc" : "#1890ff",
-        },
-      },
-    },
-    "& .MuiSwitch-thumb": {
-      boxShadow: "0 2px 4px 0 rgb(0 35 11 / 20%)",
-      width: 12,
-      height: 12,
-      borderRadius: 6,
-      transition: theme.transitions.create(["width"], {
-        duration: 200,
-      }),
-    },
-    "& .MuiSwitch-track": {
-      borderRadius: 16 / 2,
-      opacity: 1,
-      backgroundColor:
-        theme.palette.mode === "dark"
-          ? "rgba(255,255,255,.35)"
-          : "rgba(0,0,0,.25)",
-      boxSizing: "border-box",
-    },
-  }));
-
+ 
   return (
     <>
+      <div style={{ minHeight: "calc(100vh - 40px)" }}>
+
+   
+    <MuiAppBar
+      position="sticky"
+      sx={{
+        backgroundColor: "#004A92",
+        height: "70px",
+      }}>
+      <Toolbar>
+            {useMediaQuery("(min-width:1024px)") && desktopHeader}
+            {useMediaQuery("(max-width:1023px)") && mobileHeader}
+          </Toolbar>
+    </MuiAppBar>
+
       {reportScreen.loading && (
         <>
           <Backdrop
-            sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+            sx={{ color: "#fff",zIndex: (theme) => theme.zIndex.drawer + 1 }}
             open={true}
           >
             <CircularProgress color="inherit" />
@@ -441,7 +445,7 @@ const TriggerView = () => {
         initialOpen={true}
         sx={{ margin: "8px !important" }}
       >
-        <Box sx={{ marginTop: "-1%" }}>
+        <Box sx={{ marginTop: "-1%"}}>
           <Grid container rowSpacing={0} columnSpacing={2}>
           <Grid item xs={12} sm={6} md={4} lg={2} xl={3}>
               <CustomDropDown
@@ -638,7 +642,8 @@ const TriggerView = () => {
             </Box>
                     </AccordianContainer>
       )}
-
+</div>
+<StlapFooter/>
       <CustomConfirmationDialog
         dialogOpen={showNotificationDialog}
         onDialogClose={() => {
@@ -743,6 +748,7 @@ const TriggerView = () => {
           {snackBarHandler.message}
         </Alert>
       </Snackbar>
+      
     </>
   );
 };
