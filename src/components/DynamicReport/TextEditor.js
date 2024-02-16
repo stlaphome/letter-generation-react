@@ -10,22 +10,53 @@ import {
   InputLabel,
   Snackbar,
   TextField,
-  Typography,
-  useStepContext,
+  useMediaQuery,
 } from "@mui/material";
 import Checkbox from "@mui/material/Checkbox";
+import MuiAppBar from "@mui/material/AppBar";
+import Toolbar from "@mui/material/Toolbar";
+import Logo from "../../images/SF_Logo.png";
+import SFLogoSmall from "../../images/SFLogo.png";
+import Stack from "@mui/material/Stack";
+
 import { Editor } from "@tinymce/tinymce-react";
 import axios from "axios";
 import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import AccordianContainer from "../CustomComponents/AccordianContainer";
-import CustomConfirmationDialog from "../CustomComponents/CustomConfirmationDialog";
 import CustomDropDown from "../CustomComponents/CustomDropDown";
 import CustomTextField from "../CustomComponents/CustomTextField";
 import { DynamicReportReducerAction } from "../Store/DynamicReport/DynamicReportReducer";
 import VariablesDialog from "./VariablesDialog";
+import StlapFooter from "../CustomComponents/StlapFooter";
 
-import CustomAutoComplete from "../CustomComponents/CustomAutoComplete";
+const drawerWidth = 300;
+
+
+
+const desktopHeader = (
+  <>
+    <Stack direction="row" sx={{ width: "calc(100% - 600px)" }}>
+      <img height="36px" src={Logo} alt="No Logo"></img>
+    </Stack>          
+
+  </>
+);
+
+const mobileHeader = (
+  <>
+    <Stack direction="row" sx={{ width: "calc(100% - 600px)" }}>
+      <img
+        id="logoimage"
+        src={SFLogoSmall}
+        width={50}
+        height={50}
+        alt="No Logo"
+      ></img>
+    </Stack>
+  </>
+);
+
 
 const TextEditor = () => {
   let newAxiosBase = { ...axios };
@@ -352,6 +383,19 @@ const getApiKeyValue=async()=>{
 
   return (
     <>
+          <div style={{ minHeight: "calc(100vh - 40px)" }}>
+
+    <MuiAppBar
+      position="sticky"
+      sx={{
+        backgroundColor: "#004A92",
+        height: "70px",
+      }}>
+      <Toolbar>
+            {useMediaQuery("(min-width:1024px)") && desktopHeader}
+            {useMediaQuery("(max-width:1023px)") && mobileHeader}
+          </Toolbar>
+    </MuiAppBar>
       {reportScreen.loading && (
         <>
           <Backdrop
@@ -610,6 +654,8 @@ const getApiKeyValue=async()=>{
           {snackBarHandler.message}
         </Alert>
       </Snackbar>
+      </div>
+      <StlapFooter/>
     </>
   );
 };
