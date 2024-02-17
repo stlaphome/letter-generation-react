@@ -14,8 +14,8 @@ function App() {
         <Routes>
           <Route path={`/lettergeneration/home/*`} element={<Pagelayout />} />
           <Route path="*" element={<PageNotFound />} />
-          <Route path={`/lettergeneration/stlap/letterGenerationCreate`} element={<TextEditor />} />
-          <Route path={`/lettergeneration/stlap/letterGenerationTrigger`} element={<TriggerView />} />
+          <Route path={`/lettergeneration/stlap/letterGenerationCreate`} element={<TextEditor stlap={true}/>} />
+          <Route path={`/lettergeneration/stlap/letterGenerationTrigger`} element={<TriggerView stlap={true}/>} />
         </Routes>
       </div>
     </>
