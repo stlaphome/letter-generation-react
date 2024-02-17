@@ -60,8 +60,9 @@ const mobileHeader = (
 );
 
 
-const TriggerView = () => {
+const TriggerView = (props) => {
   const dispatch = useDispatch();
+  const deviceModeValue = useMediaQuery("(max-width:1200px)");
 
   const [errorExists, setErrorExists] = useState({
     value: false,
@@ -416,7 +417,7 @@ const TriggerView = () => {
     <>
       <div style={{ minHeight: "calc(100vh - 40px)" }}>
 
-   
+   {props.stlap && (
     <MuiAppBar
       position="sticky"
       sx={{
@@ -424,10 +425,18 @@ const TriggerView = () => {
         height: "70px",
       }}>
       <Toolbar>
-            {useMediaQuery("(min-width:1024px)") && desktopHeader}
-            {useMediaQuery("(max-width:1023px)") && mobileHeader}
+      {
+              <Stack direction="row" sx={{ width: "calc(100% - 600px)" }}>
+                <img
+                  height="36px"
+                  src={!deviceModeValue ? Logo : SFLogoSmall}
+                  alt="No Logo"
+                ></img>
+              </Stack>
+            }
           </Toolbar>
     </MuiAppBar>
+   )}
 
       {reportScreen.loading && (
         <>

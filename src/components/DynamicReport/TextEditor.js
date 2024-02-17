@@ -58,10 +58,11 @@ const mobileHeader = (
 );
 
 
-const TextEditor = () => {
+const TextEditor = (props) => {
   let newAxiosBase = { ...axios };
   newAxiosBase.defaults.baseURL =
     process.env.REACT_APP_STLAP_LETTER_GENERATION_BACKEND;
+    const deviceModeValue = useMediaQuery("(max-width:1200px)");
 
   const dispatch = useDispatch();
 
@@ -385,6 +386,7 @@ const getApiKeyValue=async()=>{
     <>
           <div style={{ minHeight: "calc(100vh - 40px)" }}>
 
+          {props.stlap && (
     <MuiAppBar
       position="sticky"
       sx={{
@@ -392,10 +394,18 @@ const getApiKeyValue=async()=>{
         height: "70px",
       }}>
       <Toolbar>
-            {useMediaQuery("(min-width:1024px)") && desktopHeader}
-            {useMediaQuery("(max-width:1023px)") && mobileHeader}
+      {
+              <Stack direction="row" sx={{ width: "calc(100% - 600px)" }}>
+                <img
+                  height="36px"
+                  src={!deviceModeValue ? Logo : SFLogoSmall}
+                  alt="No Logo"
+                ></img>
+              </Stack>
+            }
           </Toolbar>
     </MuiAppBar>
+   )}
       {reportScreen.loading && (
         <>
           <Backdrop
