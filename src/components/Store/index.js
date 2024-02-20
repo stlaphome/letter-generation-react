@@ -7,6 +7,7 @@ import { persistStore, persistReducer } from "redux-persist";
 import thunk from "redux-thunk";
 
 import DynamicReportReducer from "./DynamicReport/DynamicReportReducer";
+import SessionTimer from "./SessionTimer";
 
 const persistConfig = {
   key: "branch",
@@ -15,8 +16,9 @@ const persistConfig = {
 const persistedReducer = persistReducer(persistConfig, Branch);
 const store = configureStore({
   reducer: {
-    branch: persistedReducer,   
+    branch: persistedReducer,
     letterGeneration: DynamicReportReducer,
+    sessiontimer: SessionTimer,
   },
   middleware: [thunk],
 });

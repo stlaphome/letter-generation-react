@@ -29,11 +29,13 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import Toolbar from "@mui/material/Toolbar";
 import { styled } from "@mui/material/styles";
-import { default as React, useEffect, useLayoutEffect, useState } from "react";
+import { default as React, useEffect, useState } from "react";
 import SFLogoSmall from "../../images/SFLogo.png";
 import Logo from "../../images/SF_Logo.png";
+import NxtGenLogo from "../../images/sfh_nextgen_logo.png";
 
 import CryptoJS from "crypto-js";
+import store from "../Store/index";
 
 import {
   Route,
@@ -47,7 +49,8 @@ import axios from "axios";
 import PageNotFound from "../CustomComponents/PageNotFound";
 import TextEditor from "../DynamicReport/TextEditor";
 import TriggerView from "../DynamicReport/TriggerView";
-import HandShake from "../CustomComponents/HandShake";
+import { SessionTimerAction } from "../Store/SessionTimer";
+import { useDispatch } from "react-redux";
 
 const drawerWidth = 300;
 
@@ -75,6 +78,7 @@ function Pagelayout() {
   const [openLetterGenerationSubMenu, setOpenLetterGenerationSubMenu] =
     useState(true);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const { search } = useLocation();
   const deviceModeValue = useMediaQuery("(max-width:1200px)");
 
@@ -85,9 +89,12 @@ function Pagelayout() {
   const [initialPollAfterLoad, setInitialPollAfterLoad] = useState(true);
   const [latestSessionData, setLatestSessionData] = useState({});
   const [userName, setUserName] = useState("");
+  const defaultSessionTime = store.getState().sessiontimer.defaultSessionTime;
   let newAxiosBase = { ...axios };
   newAxiosBase.defaults.baseURL =
     process.env.REACT_APP_NON_LMS_COMMON_LOGIN_BACKEND_SERVER;
+
+  const [loading, setLoading] = useState(true);
 
   let paramValues = useParams();
 
@@ -163,7 +170,7 @@ function Pagelayout() {
     const activeSessionTabId = urlParamValues[encodedActiveSessionTabId];
     const uiPollCountDown = setInterval(() => {
       "use strict";
-      const pollValue = new Boolean(startPoll);
+      const pollValue = startPoll;
       const initialPollAfterLoadValue = new Boolean(initialPollAfterLoad);
       if (pollValue) {
         const sessionDataString = localStorage.getItem(
@@ -257,7 +264,7 @@ function Pagelayout() {
         : sessionDataString;
       const currentTabConfigDt = sessionData?.encodedConfigDtKey;
       const currentTabrandomKeyDt = sessionData?.encodedRandomKey;
-      const pollValue = new Boolean(startPoll);
+      const pollValue = startPoll;
       if (pollValue) {
         if (userIdValue) {
           // get from internal login.
@@ -633,7 +640,112 @@ function Pagelayout() {
     }
   }, []);
 
-  const [loading, setLoading] = useState(true);
+  const resetSessionTimeToDefault = (event) => {
+    // console.log(event);
+    const defaultSessionTime = store.getState().sessiontimer.defaultSessionTime;
+    localStorage.setItem("CurrentSessionDefaultTime", defaultSessionTime);
+    localStorage.setItem("CurrentSessionTime", defaultSessionTime);
+  };
+
+  const getDefaultSessionTime = async () => {
+    const subproductValue = String(window.location.pathname).includes(
+      "dashboard_redirect"
+    )
+      ? "COMMON_DASHBOARD"
+      : "LETTER_GENERATION";
+    const timerResponse = await axios.post(
+      "nonlmscommonlogin/getSubProductDataByCode",
+      {
+        subProductCode: [subproductValue],
+      }
+    );
+
+    if (timerResponse.status === 200) {
+      const subProductDetails = timerResponse.data;
+      const sessionTimeInMinutes = subProductDetails[0]?.defaultSessionTime;
+      dispatch(
+        SessionTimerAction.updateDefaultSessionTime(
+          Number(sessionTimeInMinutes * 60)
+        )
+      );
+    }
+  };
+
+  useEffect(() => {
+    // Set up event listeners for user activity
+    document.addEventListener("mousemove", resetSessionTimeToDefault);
+    document.addEventListener("keypress", resetSessionTimeToDefault);
+    // initial execution once on the page load.
+    getDefaultSessionTime();
+    // after 1 sec get the latest value from the redux store.
+    setTimeout(() => {
+      const defaultSessionTime =
+        store.getState().sessiontimer.defaultSessionTime;
+      localStorage.setItem("CurrentSessionDefaultTime", defaultSessionTime);
+      localStorage.setItem("CurrentSessionTime", defaultSessionTime);
+    }, 1000);
+
+    // this method is to poll the session time for every 10 minutes once to UI.
+    const sessionTimePoll = setInterval(async () => {
+      "use strict";
+      const pollValue = startPoll;
+      if (pollValue) {
+        // get subproduct data to session timer load.
+        await getDefaultSessionTime();
+        // after 1 sec get the latest value from the redux store.
+        setTimeout(() => {
+          const defaultSessionTime =
+            store.getState().sessiontimer.defaultSessionTime;
+          localStorage.setItem("CurrentSessionDefaultTime", defaultSessionTime);
+          localStorage.setItem("CurrentSessionTime", defaultSessionTime);
+        }, 1000);
+      }
+    }, 600000);
+
+    return () => {
+      document.removeEventListener("mousemove", resetSessionTimeToDefault);
+      document.removeEventListener("keypress", resetSessionTimeToDefault);
+      clearInterval(sessionTimePoll);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!String(window.location.pathname).includes("dashboard_redirect")) {
+      const countDown = setInterval(() => {
+        "use strict";
+        const pollValue = startPoll;
+        let sessionTime = localStorage.getItem("CurrentSessionTime");
+        if (pollValue) {
+          let sessionTimerElement = document.getElementById("sessiontimerid");
+          console.log(sessionTimerElement);
+          const timeInSecs = Number(sessionTime);
+          let min = Math.floor(timeInSecs / 60),
+            remSec = timeInSecs % 60;
+
+          if (remSec < 10) {
+            remSec = "0" + remSec;
+          }
+          if (min < 10) {
+            min = "0" + min;
+          }
+
+          sessionTimerElement.innerHTML = min + ":" + remSec;
+
+          if (timeInSecs > 0) {
+            sessionTime = timeInSecs - 1;
+            localStorage.setItem("CurrentSessionTime", sessionTime);
+          } else {
+            clearInterval(countDown);
+            localStorage.setItem("CurrentSessionTime", 0);
+            handleLogout(true);
+          }
+        }
+      }, 1000);
+      return () => {
+        clearInterval(countDown);
+      };
+    }
+  }, [defaultSessionTime]);
 
   const handleLogout = async (manualtrigger) => {
     let newAxiosBase = { ...axios };
@@ -923,7 +1035,7 @@ function Pagelayout() {
             sx={{
               textAlign: "right",
               color: "white",
-              fontSize: "1.5rem",
+              // fontSize: "1.5rem",
               fontFamily: "Roboto",
             }}
           >
@@ -944,7 +1056,16 @@ function Pagelayout() {
           <Stack
             direction="column"
             sx={{ alignItems: "center", marginRight: "8px" }}
-          ></Stack>
+          >
+            {!String(window.location.pathname).includes(
+              "dashboard_redirect"
+            ) && (
+              <Typography sx={{ fontFamily: "Roboto" }}>
+                {"Session Ends In"}
+              </Typography>
+            )}
+            <span style={{ fontFamily: "Roboto" }} id="sessiontimerid"></span>
+          </Stack>
           <Tooltip title="Logout">
             <IconButton onClick={() => handleLogout(true)}>
               <LogoutTwoTone sx={{ color: "white" }} fontSize="large" />
@@ -989,7 +1110,8 @@ function Pagelayout() {
               <Stack direction="row" sx={{ width: "calc(100% - 600px)" }}>
                 <img
                   height="36px"
-                  src={!deviceModeValue ? Logo : SFLogoSmall}
+                  // src={!deviceModeValue ? Logo : SFLogoSmall}
+                  src={NxtGenLogo}
                   alt="No Logo"
                 ></img>
               </Stack>
@@ -1023,8 +1145,7 @@ function Pagelayout() {
               }}
               open={true}
             >
-              {deviceModeValue && <CircularProgress color="inherit" />}
-              {!deviceModeValue && <HandShake />}
+              <CircularProgress color="inherit" />
             </Backdrop>
           </>
         ) : (
