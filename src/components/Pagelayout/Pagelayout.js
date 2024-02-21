@@ -728,7 +728,7 @@ function Pagelayout() {
       document.removeEventListener("keypress", resetSessionTimeToDefault);
       clearInterval(sessionTimePoll);
     };
-  }, []);
+  }, [userName]);
 
   useEffect(() => {
     if (!String(window.location.pathname).includes("dashboard_redirect")) {
