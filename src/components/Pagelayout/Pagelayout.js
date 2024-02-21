@@ -643,8 +643,14 @@ function Pagelayout() {
   const resetSessionTimeToDefault = (event) => {
     // console.log(event);
     const defaultSessionTime = store.getState().sessiontimer.defaultSessionTime;
-    localStorage.setItem("CurrentSessionDefaultTime", defaultSessionTime);
-    localStorage.setItem("CurrentSessionTime", defaultSessionTime);
+    localStorage.setItem(
+      "CurrentSessionDefaultTime" + "-" + userName,
+      defaultSessionTime
+    );
+    localStorage.setItem(
+      "CurrentSessionTime" + "-" + userName,
+      defaultSessionTime
+    );
   };
 
   const getDefaultSessionTime = async () => {
@@ -672,18 +678,27 @@ function Pagelayout() {
   };
 
   useEffect(() => {
-    // Set up event listeners for user activity
-    document.addEventListener("mousemove", resetSessionTimeToDefault);
-    document.addEventListener("keypress", resetSessionTimeToDefault);
     // initial execution once on the page load.
     getDefaultSessionTime();
     // after 1 sec get the latest value from the redux store.
     setTimeout(() => {
       const defaultSessionTime =
         store.getState().sessiontimer.defaultSessionTime;
-      localStorage.setItem("CurrentSessionDefaultTime", defaultSessionTime);
-      localStorage.setItem("CurrentSessionTime", defaultSessionTime);
+      localStorage.setItem(
+        "CurrentSessionDefaultTime" + "-" + userName,
+        defaultSessionTime
+      );
+      localStorage.setItem(
+        "CurrentSessionTime" + "-" + userName,
+        defaultSessionTime
+      );
     }, 1000);
+  }, [userName]);
+
+  useEffect(() => {
+    // Set up event listeners for user activity
+    document.addEventListener("mousemove", resetSessionTimeToDefault);
+    document.addEventListener("keypress", resetSessionTimeToDefault);
 
     // this method is to poll the session time for every 10 minutes once to UI.
     const sessionTimePoll = setInterval(async () => {
@@ -696,8 +711,14 @@ function Pagelayout() {
         setTimeout(() => {
           const defaultSessionTime =
             store.getState().sessiontimer.defaultSessionTime;
-          localStorage.setItem("CurrentSessionDefaultTime", defaultSessionTime);
-          localStorage.setItem("CurrentSessionTime", defaultSessionTime);
+          localStorage.setItem(
+            "CurrentSessionDefaultTime" + "-" + userName,
+            defaultSessionTime
+          );
+          localStorage.setItem(
+            "CurrentSessionTime" + "-" + userName,
+            defaultSessionTime
+          );
         }, 1000);
       }
     }, 600000);
@@ -714,9 +735,12 @@ function Pagelayout() {
       const countDown = setInterval(() => {
         "use strict";
         const pollValue = startPoll;
-        let sessionTime = localStorage.getItem("CurrentSessionTime");
+
         if (pollValue) {
           let sessionTimerElement = document.getElementById("sessiontimerid");
+          let sessionTime = localStorage.getItem(
+            "CurrentSessionTime" + "-" + userName
+          );
           console.log(sessionTimerElement);
           const timeInSecs = Number(sessionTime);
           let min = Math.floor(timeInSecs / 60),
@@ -730,13 +754,16 @@ function Pagelayout() {
           }
 
           sessionTimerElement.innerHTML = min + ":" + remSec;
-
+          debugger;
           if (timeInSecs > 0) {
             sessionTime = timeInSecs - 1;
-            localStorage.setItem("CurrentSessionTime", sessionTime);
+            localStorage.setItem(
+              "CurrentSessionTime" + "-" + userName,
+              sessionTime
+            );
           } else {
             clearInterval(countDown);
-            localStorage.setItem("CurrentSessionTime", 0);
+            localStorage.setItem("CurrentSessionTime" + "-" + userName, 0);
             handleLogout(true);
           }
         }
