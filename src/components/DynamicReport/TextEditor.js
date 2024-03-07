@@ -638,8 +638,9 @@ const getApiKeyValue=async()=>{
               "Andale Mono=andale mono,times; Arial=arial,helvetica,sans-serif; Arial Black=arial black,avant garde; Book Antiqua=book antiqua,palatino; Calibri=Calibri;  Comic Sans MS=comic sans ms,sans-serif; Courier New=courier new,courier; Georgia=georgia,palatino; Helvetica=helvetica; Impact=impact,chicago; Symbol=symbol; Tahoma=tahoma,arial,helvetica,sans-serif; Terminal=terminal,monaco; Times New Roman=times new roman,times; Trebuchet MS=trebuchet ms,geneva; Verdana=verdana,geneva; Webdings=webdings; Wingdings=wingdings,zapf dingbats",
               plugins:
               "nonbreaking preview searchreplace autolink directionality visualblocks visualchars image link media codesample table charmap pagebreak nonbreaking anchor insertdatetime advlist lists wordcount help charmap  linkchecker emoticons autosave",
-            toolbar:
-              "nonbreaking undo redo spellcheckdialog formatpainter | blocks fontfamily fontsize | bold italic underline forecolor backcolor | link image addcomment showcomments  | alignleft aligncenter alignright alignjustify lineheight | bullist numlist indent outdent | removeformat",
+              toolbar:
+              "nonbreaking undo redo spellcheckdialog formatpainter | blocks fontfamily fontsize | bold italic underline forecolor backcolor | link image addcomment showcomments | alignleft aligncenter alignright alignjustify lineheight | bullist numlist indent outdent | removeformat",
+            content_style: "p {line-height:1em !important; margin-block-start: 0.25px !important;margin-block-end: 0.25em !important;  }",
             toolbar_sticky: true,
             nonbreaking_force_tab: true,
             pagebreak_separator: '<div style="page-break-before: always;"></div>',
